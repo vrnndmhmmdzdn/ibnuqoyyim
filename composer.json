@@ -39,7 +39,9 @@
             "Modules\\Forum\\": "Modules/Forum/",
             "Modules\\Siswa\\": "Modules/Siswa/",
             "Modules\\JadwalPelajaran\\": "Modules/JadwalPelajaran/",
-            "Modules\\AuditLog\\": "Modules/AuditLog/"
+            "Modules\\AuditLog\\": "Modules/AuditLog/",
+            "Modules\\JurnalGuru\\": "Modules/JurnalGuru/",
+            "Modules\\AbsensiStaf\\": "Modules/AbsensiStaf/"
         }
     },
     "autoload-dev": {

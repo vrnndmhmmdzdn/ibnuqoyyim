@@ -80,6 +80,10 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: base_path('Modules/Siswa/Filament/Pages'), for: 'Modules\Siswa\Filament\Pages')
             ->discoverResources(in: base_path('modules/AuditLog/Filament/Resources'), for: 'Modules\AuditLog\Filament\Resources')
             ->discoverResources(in: base_path('modules/JadwalPelajaran/Filament/Resources'), for: 'Modules\JadwalPelajaran\Filament\Resources')
-            ->discoverPages(in: base_path('modules/JadwalPelajaran/Filament/Pages'), for: 'Modules\JadwalPelajaran\Filament\Pages');
+            ->discoverPages(in: base_path('modules/JadwalPelajaran/Filament/Pages'), for: 'Modules\JadwalPelajaran\Filament\Pages')
+            ->discoverResources(in: base_path('modules/JurnalGuru/Filament/Resources'), for: 'Modules\JurnalGuru\Filament\Resources')
+            ->discoverPages(in: base_path('modules/JurnalGuru/Filament/Pages'), for: 'Modules\JurnalGuru\Filament\Pages')
+            ->discoverResources(in: base_path('modules/AbsensiStaf/Filament/Resources'), for: 'Modules\AbsensiStaf\Filament\Resources')
+            ->discoverPages(in: base_path('modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages');
         }
 }
