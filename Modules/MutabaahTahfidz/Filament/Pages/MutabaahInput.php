@@ -80,7 +80,7 @@ class MutabaahInput extends Page
         if (!$this->kelas_id || !$this->tanggal) return collect();
 
         return MutabaahRecord::with(['surah'])
-            ->where('kelas_id', $this->kelas_id)
+            ->whereIn('siswa_id', $this->siswaList()->pluck('id'))
             ->whereDate('tanggal', $this->tanggal)
             ->get()
             ->keyBy('siswa_id');
@@ -133,7 +133,7 @@ class MutabaahInput extends Page
         if (!$this->selected_siswa_id || !$this->kelas_id) return null;
 
         return MutabaahRecord::with('surah')
-            ->where('kelas_id', $this->kelas_id)
+            // ->where('kelas_id', $this->kelas_id)
             ->where('siswa_id', $this->selected_siswa_id)
             ->whereDate('tanggal', '!=', $this->tanggal)
             ->whereIn('status', MutabaahRecord::STATUS_NEEDS_SURAH)
