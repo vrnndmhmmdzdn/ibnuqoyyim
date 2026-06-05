@@ -249,13 +249,35 @@
     }
 
     // Deteksi lokasi GPS
+    // function deteksiLokasi() {
+    //     if (!navigator.geolocation) {
+    //         updateLokasiStatus(false, 'Browser tidak mendukung GPS');
+    //         return;
+    //     }
+
+    //     navigator.geolocation.watchPosition(
+    //         (pos) => {
+    //             const lat = pos.coords.latitude;
+    //             const lng = pos.coords.longitude;
+    //             @this.set('lat', lat);
+    //             @this.set('lng', lng);
+    //             updateLokasiStatus(true, `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+    //         },
+    //         (err) => {
+    //             updateLokasiStatus(false, 'Gagal deteksi lokasi — izinkan akses GPS');
+    //         },
+    //         { enableHighAccuracy: true, timeout: 10000 }
+    //     );
+    // }
+    // Deteksi lokasi GPS
     function deteksiLokasi() {
         if (!navigator.geolocation) {
             updateLokasiStatus(false, 'Browser tidak mendukung GPS');
             return;
         }
 
-        navigator.geolocation.watchPosition(
+        // Menggunakan getCurrentPosition agar tidak membebani koneksi secara berkala
+        navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
@@ -264,9 +286,35 @@
                 updateLokasiStatus(true, `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
             },
             (err) => {
-                updateLokasiStatus(false, 'Gagal deteksi lokasi — izinkan akses GPS');
+                // Jika gagal dengan High Accuracy, coba dengan akurasi rendah (IP berbasis Wi-Fi)
+                if (err.code === err.TIMEOUT) {
+                    updateLokasiStatus(false, 'Mencoba mendeteksi ulang...');
+                     AmbilLokasiCepat();
+                } else {
+                    updateLokasiStatus(false, 'Gagal deteksi lokasi — izinkan akses GPS');
+                }
             },
-            { enableHighAccuracy: true, timeout: 10000 }
+            { 
+                enableHighAccuracy: false, // Set false saat dev di laptop agar memakai IP/Wifi yang lebih cepat
+                timeout: 5000,             // Batasi tunggu maksimal 5 detik
+                maximumAge: 60000          // Boleh menggunakan data lokasi yang sudah tersimpan di cache 1 menit lalu
+            }
+        );
+    }
+
+    function AmbilLokasiCepat() {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                @this.set('lat', lat);
+                @this.set('lng', lng);
+                updateLokasiStatus(true, `${lat.toFixed(5)}, ${lng.toFixed(5)} (IP Base)`);
+            },
+            (err) => {
+                updateLokasiStatus(false, 'Gagal mendeteksi lokasi. Pastikan GPS aktif.');
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: Infinity }
         );
     }
 

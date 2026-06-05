@@ -4,6 +4,7 @@ namespace Modules\JurnalGuru\Filament\Resources\JurnalGuruResource\RelationManag
 
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Hidden;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
@@ -14,6 +15,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Modules\JurnalGuru\Models\JurnalLampiran;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class LampiranRelationManager extends RelationManager
 {
@@ -40,12 +42,16 @@ class LampiranRelationManager extends RelationManager
                 ])
                 ->maxSize(10240)
                 ->imagePreviewHeight('100')
+                ->live()
                 ->afterStateUpdated(function ($state, callable $set) {
-                    if (!$state) return;
-                    $ekstensi = pathinfo($state->getClientOriginalName(), PATHINFO_EXTENSION);
-                    $set('nama_file', $state->getClientOriginalName());
-                    $set('ukuran', $state->getSize());
-                    $set('tipe', JurnalLampiran::deteksiTipe($ekstensi));
+                    if ($state instanceof TemporaryUploadedFile) {
+                        $clientName = $state->getClientOriginalName();
+                        $ekstensi = pathinfo($clientName, PATHINFO_EXTENSION);
+                        
+                        $set('nama_file', $clientName);
+                        $set('ukuran', $state->getSize());
+                        $set('tipe', JurnalLampiran::deteksiTipe($ekstensi));
+                    }
                 })
                 ->columnSpanFull(),
 
@@ -54,6 +60,9 @@ class LampiranRelationManager extends RelationManager
                 ->options(JurnalLampiran::TIPE)
                 ->required()
                 ->native(false),
+
+            Hidden::make('nama_file'),
+            Hidden::make('ukuran'),
         ]);
     }
 
@@ -102,9 +111,14 @@ class LampiranRelationManager extends RelationManager
                 CreateAction::make()
                     ->label('Tambah Lampiran')
                     ->mutateFormDataUsing(function (array $data): array {
-                        if (isset($data['path']) && is_object($data['path'])) {
-                            $data['nama_file'] = $data['path']->getClientOriginalName();
-                            $data['ukuran']    = $data['path']->getSize();
+                        if (isset($data['path'])) {
+                            if ($data['path'] instanceof TemporaryUploadedFile) {
+                                $data['nama_file'] = $data['path']->getClientOriginalName();
+                                $data['ukuran']    = $data['path']->getSize();
+                            } elseif (is_string($data['path'])) {
+                                $data['nama_file'] = $data['nama_file'] ?? basename($data['path']);
+                                $data['ukuran']    = $data['ukuran'] ?? 0;
+                            }
                         }
                         return $data;
                     }),
@@ -113,4 +127,4 @@ class LampiranRelationManager extends RelationManager
                 ]),
             ]);
     }
-}
+}   

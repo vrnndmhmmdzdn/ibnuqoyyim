@@ -21,7 +21,7 @@ class GuruResource extends Resource
 {
     protected static ?string $model = Guru::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
 
     protected static ?string $navigationLabel = 'Data Guru  ';
 

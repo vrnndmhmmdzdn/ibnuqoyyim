@@ -2,13 +2,13 @@
 
 namespace Modules\AbsensiStaf\Filament\Resources\Pages;
 
-use Modules\AbsensiStaf\Filament\Resources\AbsensiStafResource;
+use Modules\AbsensiStaf\Filament\Resources\HariLiburResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditAbsensiStaf extends EditRecord
+class EditHariLibur extends EditRecord
 {
-    protected static string $resource = AbsensiStafResource::class;
+    protected static string $resource = HariLiburResource::class;
 
     protected function getHeaderActions(): array
     {

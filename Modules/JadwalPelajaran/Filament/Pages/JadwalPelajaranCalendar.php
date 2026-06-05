@@ -14,8 +14,8 @@ class JadwalPelajaranCalendar extends Page
 {
     protected string $view = 'jadwal-pelajaran::filament.pages.jadwal-pelajaran-calendar';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTableCells;
-    protected static ?string $navigationLabel = 'Jadwal Pelajaran';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
+    protected static ?string $navigationLabel = 'Kalender Jadwal';
     protected static string|UnitEnum|null $navigationGroup = 'Akademik';
     protected static ?int $navigationSort = 1;
 

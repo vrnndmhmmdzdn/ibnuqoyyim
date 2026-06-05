@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Angkatan\Models\Angkatan;
+use Modules\Kelas\Models\Kelas;
 use Modules\Siswa\Database\Factories\SiswaFactory;
 
 class Siswa extends Model
@@ -37,5 +38,11 @@ class Siswa extends Model
     protected static function newFactory()
     {
         return SiswaFactory::new();
+    }
+    public function kelas()
+    {
+        return $this->belongsToMany(Kelas::class, 'kelas_pivot')
+                    ->withPivot('is_aktif')
+                    ->withTimestamps();
     }
 }

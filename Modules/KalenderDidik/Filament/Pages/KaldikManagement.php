@@ -18,7 +18,7 @@ class KaldikManagement extends Page
 {
     protected string $view = 'kalender-didik::filament.pages.kaldik-management';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::AdjustmentsHorizontal;
     protected static ?string $navigationLabel = 'Manajemen Kaldik';
     protected static string|UnitEnum|null $navigationGroup = 'Kalender Pendidikan';
     protected static ?int $navigationSort = 2;

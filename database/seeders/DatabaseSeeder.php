@@ -17,23 +17,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-        User::factory()->create([
-            'name' => 'Chika',
-            'email' => 'chika@example.com',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Chika',
+        //     'email' => 'chika@example.com',
+        // ]);
         $this->call([
-            \Modules\Guru\Database\Seeders\GuruSeeder::class,
-            \Modules\Angkatan\Database\Seeders\AngkatanSeeder::class,
-            \Modules\TahunAjaran\Database\Seeders\TahunAjaranSeeder::class,
-            \Modules\KalenderDidik\Database\Seeders\KaldikSeeder::class,
-            \Modules\Kelas\Database\Seeders\KelasSeeder::class,
-            \Modules\Siswa\Database\Seeders\SiswaSeeder::class,
-            \Modules\MataPelajaran\Database\Seeders\MataPelajaranSeeder::class,
+            // \Modules\Guru\Database\Seeders\GuruSeeder::class,
+            // \Modules\Angkatan\Database\Seeders\AngkatanSeeder::class,
+            // \Modules\TahunAjaran\Database\Seeders\TahunAjaranSeeder::class,
+            // \Modules\Kelas\Database\Seeders\KelasSeeder::class,
+            // \Modules\Siswa\Database\Seeders\SiswaSeeder::class,
+            // \Modules\MataPelajaran\Database\Seeders\MataPelajaranSeeder::class,
+            // \Modules\KalenderDidik\Database\Seeders\KaldikSeeder::class,
+            // \Modules\KelasPivot\Database\Seeders\KelasPivotSeeder::class,
             // \Modules\JadwalPelajaran\Database\Seeders\JadwalPelajaranSeeder::class
+            // \Modules\AbsensiStaf\Database\Seeders\AbsensiStafSeeder::class
+            // \Modules\MutabaahTahfidz\Database\Seeders\MutabaahSurahSeeder::class
+            \Modules\MutabaahTahfidz\Database\Seeders\MutabaahRecordSeeder::class,
             // Tambahkan class seeder modul lainnya di bawah ini...
         ]);
     }

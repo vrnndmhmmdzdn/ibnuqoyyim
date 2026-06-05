@@ -21,7 +21,7 @@ class MataPelajaranResource extends Resource
 {
     protected static ?string $model = MataPelajaran::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::CalendarDays;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::BookOpen;
 
     protected static ?string $navigationLabel = 'Mata Pelajaran';
 

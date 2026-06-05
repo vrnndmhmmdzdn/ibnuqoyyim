@@ -11,9 +11,9 @@ class JadwalPelajaranManagement extends Page
 {
     protected string $view = 'jadwal-pelajaran::filament.pages.jadwal-pelajaran-management';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Trophy;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentPlus;
 
-    protected static ?string $navigationLabel = 'Jadwal Management';
+    protected static ?string $navigationLabel = 'Input Jadwal';
 
     protected static string | UnitEnum | null $navigationGroup = 'Akademik';
 

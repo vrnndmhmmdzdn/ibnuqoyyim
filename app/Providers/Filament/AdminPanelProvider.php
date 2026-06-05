@@ -84,6 +84,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: base_path('modules/JurnalGuru/Filament/Resources'), for: 'Modules\JurnalGuru\Filament\Resources')
             ->discoverPages(in: base_path('modules/JurnalGuru/Filament/Pages'), for: 'Modules\JurnalGuru\Filament\Pages')
             ->discoverResources(in: base_path('modules/AbsensiStaf/Filament/Resources'), for: 'Modules\AbsensiStaf\Filament\Resources')
-            ->discoverPages(in: base_path('modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages');
+            ->discoverPages(in: base_path('modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages')
+            ->discoverResources(in: base_path('modules/MutabaahTahfidz/Filament/Resources'), for: 'Modules\MutabaahTahfidz\Filament\Resources')
+            ->discoverPages(in: base_path('modules/MutabaahTahfidz/Filament/Pages'), for: 'Modules\MutabaahTahfidz\Filament\Pages')
+            ->discoverResources(in: base_path('modules/KelasPivot/Filament/Resources'), for: 'Modules\KelasPivot\Filament\Resources')
+            ->discoverPages(in: base_path('modules/KelasPivot/Filament/Pages'), for: 'Modules\KelasPivot\Filament\Pages');
+            
         }
 }

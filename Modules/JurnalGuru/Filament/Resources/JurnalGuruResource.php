@@ -21,7 +21,7 @@ class JurnalGuruResource extends Resource
 {
     protected static ?string $model = JurnalGuru::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Identification;
 
     protected static ?string $recordTitleAttribute = 'jadwal';
 

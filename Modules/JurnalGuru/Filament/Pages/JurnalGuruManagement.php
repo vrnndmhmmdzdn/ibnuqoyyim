@@ -15,8 +15,8 @@ class JurnalGuruManagement extends Page
 {
     protected string $view = 'jurnal-guru::filament.pages.jurnal-guru-management';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
-    protected static ?string $navigationLabel = 'Manajemen Jurnal';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PresentationChartBar;
+    protected static ?string $navigationLabel = 'Overview Jurnal';
     protected static string|UnitEnum|null $navigationGroup = 'Jurnal';
     protected static ?int $navigationSort = 3;
 
