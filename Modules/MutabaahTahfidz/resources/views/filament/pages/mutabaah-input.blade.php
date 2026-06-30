@@ -217,7 +217,7 @@
                                 <div class="siswa-name">{{ $siswa->nama_lengkap }}</div>
                                 @if ($rec)
                                     <div class="siswa-sub">
-                                        {{ MutabaahRecord::STATUS[$rec->status] }}
+                                        {{ \Modules\MutabaahTahfidz\Models\MutabaahRecord::STATUS[$rec->status] }}
                                         @if ($rec->surah)
                                             · {{ $rec->surah->nama_surah }}
                                             {{ $rec->ayat_awal }}–{{ $rec->ayat_akhir }}

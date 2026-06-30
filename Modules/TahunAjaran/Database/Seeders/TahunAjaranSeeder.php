@@ -13,7 +13,7 @@ class TahunAjaranSeeder extends Seeder
      */
     public function run(): void
     {
-        TahunAjaran::truncate();
+        // TahunAjaran::truncate();
         TahunAjaran::factory(5)->create();
 
         // TahunAjaran::create([

@@ -35,7 +35,18 @@ class MutabaahStatistik extends Page
     {
         if (!$this->kelas_id) return [];
 
-        $query = MutabaahRecord::where('kelas_id', $this->kelas_id);
+        // Ambil siswa dari pivot dulu, lalu filter records by siswa_id
+        $siswaList = Siswa::whereHas('kelas', fn ($q) =>
+            $q->where('kelas.id', $this->kelas_id)
+              ->where('kelas_pivot.is_aktif', true)
+              ->whereNull('kelas_pivot.deleted_at')
+        )->orderBy('nama_lengkap')->get();
+
+        if ($siswaList->isEmpty()) return [];
+
+        $siswaIds = $siswaList->pluck('id');
+
+        $query = MutabaahRecord::whereIn('siswa_id', $siswaIds);
 
         $query = match ($this->periode) {
             'minggu' => (clone $query)->whereBetween('tanggal', [
@@ -46,12 +57,6 @@ class MutabaahStatistik extends Page
                                        ->whereYear('tanggal', now()->year),
             default  => clone $query,
         };
-
-        $siswaList = Siswa::whereHas('kelas', fn ($q) =>
-            $q->where('kelas.id', $this->kelas_id)
-            ->where('kelas_pivot.is_aktif', true)
-            ->whereNull('kelas_pivot.deleted_at')       
-        )->orderBy('nama_lengkap')->get();
 
         $records = $query->with(['surah', 'siswa'])->get();
         $grouped = $records->groupBy('siswa_id');

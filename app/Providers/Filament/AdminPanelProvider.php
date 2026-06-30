@@ -83,12 +83,18 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: base_path('modules/JadwalPelajaran/Filament/Pages'), for: 'Modules\JadwalPelajaran\Filament\Pages')
             ->discoverResources(in: base_path('modules/JurnalGuru/Filament/Resources'), for: 'Modules\JurnalGuru\Filament\Resources')
             ->discoverPages(in: base_path('modules/JurnalGuru/Filament/Pages'), for: 'Modules\JurnalGuru\Filament\Pages')
+            ->discoverResources(in: base_path('modules/Penilaian/Filament/Resources'), for: 'Modules\Penilaian\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Penilaian/Filament/Pages'), for: 'Modules\Penilaian\Filament\Pages')
             ->discoverResources(in: base_path('modules/AbsensiStaf/Filament/Resources'), for: 'Modules\AbsensiStaf\Filament\Resources')
             ->discoverPages(in: base_path('modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages')
             ->discoverResources(in: base_path('modules/MutabaahTahfidz/Filament/Resources'), for: 'Modules\MutabaahTahfidz\Filament\Resources')
             ->discoverPages(in: base_path('modules/MutabaahTahfidz/Filament/Pages'), for: 'Modules\MutabaahTahfidz\Filament\Pages')
             ->discoverResources(in: base_path('modules/KelasPivot/Filament/Resources'), for: 'Modules\KelasPivot\Filament\Resources')
-            ->discoverPages(in: base_path('modules/KelasPivot/Filament/Pages'), for: 'Modules\KelasPivot\Filament\Pages');
-            
+            ->discoverPages(in: base_path('modules/KelasPivot/Filament/Pages'), for: 'Modules\KelasPivot\Filament\Pages')
+            ->discoverResources(in: base_path('modules/DashboardBuilder/Filament/Resources'), for: 'Modules\DashboardBuilder\Filament\Resources')
+            ->discoverPages(in: base_path('modules/DashboardBuilder/Filament/Pages'), for: 'Modules\DashboardBuilder\Filament\Pages')
+            ->discoverResources(in: base_path('modules/Midtrans/Filament/Resources'), for: 'Modules\Midtrans\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Midtrans/Filament/Pages'), for: 'Modules\Midtrans\Filament\Pages');
+
         }
 }

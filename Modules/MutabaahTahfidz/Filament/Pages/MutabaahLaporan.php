@@ -21,34 +21,18 @@ class MutabaahLaporan extends Page
     protected static string|UnitEnum|null $navigationGroup = 'Mutabaah Tahfidz';
     protected static ?int $navigationSort      = 3;
 
-    // ── State ─────────────────────────────────────────────────────────
-
     public ?int   $kelas_id  = null;
-    public string $mode      = 'pekanan';   // pekanan | bulanan
-
-    // Pekanan
-    public string $weekStart = '';           // Monday Y-m-d
-
-    // Bulanan
+    public string $mode      = 'pekanan';
+    public string $weekStart = '';
     public int    $bulan     = 1;
     public int    $tahun     = 2025;
 
     const HARI_LABEL = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Ahd'];
     const HARI_FULL  = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad'];
-
     const BULAN_LABEL = [
-        1 => 'Januari',
-        2 => 'Februari',
-        3 => 'Maret',
-        4 => 'April',
-        5 => 'Mei',
-        6 => 'Juni',
-        7 => 'Juli',
-        8 => 'Agustus',
-        9 => 'September',
-        10 => 'Oktober',
-        11 => 'November',
-        12 => 'Desember',
+        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',
+        5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',
+        9=>'September',10=>'Oktober',11=>'November',12=>'Desember',
     ];
 
     public function mount(): void
@@ -58,7 +42,7 @@ class MutabaahLaporan extends Page
         $this->tahun     = (int) today()->format('Y');
     }
 
-    // ── Helpers: Pekanan ──────────────────────────────────────────────
+    // ── Date helpers ──────────────────────────────────────────────────
 
     private function getMondayStr(Carbon $date): string
     {
@@ -69,18 +53,16 @@ class MutabaahLaporan extends Page
     public function getWeekDates(): array
     {
         $mon = Carbon::parse($this->weekStart . 'T00:00:00');
-        return array_map(fn($i) => $mon->copy()->addDays($i)->format('Y-m-d'), range(0, 6));
+        return array_map(fn ($i) => $mon->copy()->addDays($i)->format('Y-m-d'), range(0, 6));
     }
 
     public function getWeekLabel(): string
     {
         $d = $this->getWeekDates();
         return Carbon::parse($d[0])->locale('id')->translatedFormat('d M')
-            . ' – '
-            . Carbon::parse($d[6])->locale('id')->translatedFormat('d M Y');
+             . ' – '
+             . Carbon::parse($d[6])->locale('id')->translatedFormat('d M Y');
     }
-
-    // ── Helpers: Bulanan ──────────────────────────────────────────────
 
     public function getMonthDates(): array
     {
@@ -112,13 +94,9 @@ class MutabaahLaporan extends Page
     public function tahunList(): array
     {
         $current = (int) today()->format('Y');
-        return array_combine(
-            range($current - 2, $current + 1),
-            range($current - 2, $current + 1)
-        );
+        return array_combine(range($current - 2, $current + 1), range($current - 2, $current + 1));
     }
 
-    /** Data mingguan — 7 kolom (Sen-Ahd) */
     #[Computed]
     public function weekData(): array
     {
@@ -126,21 +104,25 @@ class MutabaahLaporan extends Page
 
         $dates     = $this->getWeekDates();
         $siswaList = $this->getSiswaList();
-        $records   = $this->fetchRecords($dates[0], $dates[6]);
-        $grouped   = $records->groupBy('siswa_id');
+        if ($siswaList->isEmpty()) return [];
+
+        $records = $this->fetchRecords($dates[0], $dates[6], $siswaList);
+        $grouped = $records->groupBy('siswa_id');
 
         $result = [];
         foreach ($siswaList as $siswa) {
-            [$dayData, $sAyat, $sSetoran, $sTidak] = $this->buildDayData($grouped[$siswa->id] ?? collect(), $dates);
+            [$dayData, $sAyat, $sSetoran, $sTidak] = $this->buildDayData(
+                $grouped[$siswa->id] ?? collect(), $dates
+            );
             $result[] = compact('siswa', 'dayData') + [
                 'totalAyat' => $sAyat,
                 'setoran'   => $sSetoran,
                 'tidak'     => $sTidak,
-                'belum'     => count(array_filter($dayData, fn($r) => $r === null)),
+                'belum'     => count(array_filter($dayData, fn ($r) => $r === null)),
             ];
         }
 
-        usort($result, fn($a, $b) => $b['totalAyat'] <=> $a['totalAyat']);
+        usort($result, fn ($a, $b) => $b['totalAyat'] <=> $a['totalAyat']);
 
         return [
             'rows'       => $result,
@@ -151,7 +133,6 @@ class MutabaahLaporan extends Page
         ];
     }
 
-    /** Data bulanan — N kolom (1 per hari dalam bulan) */
     #[Computed]
     public function monthData(): array
     {
@@ -159,53 +140,61 @@ class MutabaahLaporan extends Page
 
         $dates     = $this->getMonthDates();
         $siswaList = $this->getSiswaList();
-        $records   = $this->fetchRecords($dates[0], $dates[count($dates) - 1]);
-        $grouped   = $records->groupBy('siswa_id');
+        if ($siswaList->isEmpty()) return [];
+
+        $records = $this->fetchRecords($dates[0], $dates[count($dates) - 1], $siswaList);
+        $grouped = $records->groupBy('siswa_id');
 
         $result = [];
         foreach ($siswaList as $siswa) {
-            [$dayData, $sAyat, $sSetoran, $sTidak] = $this->buildDayData($grouped[$siswa->id] ?? collect(), $dates);
-
-            // Hitung per-minggu ringkasan
+            [$dayData, $sAyat, $sSetoran, $sTidak] = $this->buildDayData(
+                $grouped[$siswa->id] ?? collect(), $dates
+            );
             $perMinggu = $this->buildWeeklySummary($dayData, $dates);
 
             $result[] = compact('siswa', 'dayData', 'perMinggu') + [
                 'totalAyat' => $sAyat,
                 'setoran'   => $sSetoran,
                 'tidak'     => $sTidak,
-                'belum'     => count(array_filter($dayData, fn($r) => $r === null)),
+                'belum'     => count(array_filter($dayData, fn ($r) => $r === null)),
             ];
         }
 
-        usort($result, fn($a, $b) => $b['totalAyat'] <=> $a['totalAyat']);
+        usort($result, fn ($a, $b) => $b['totalAyat'] <=> $a['totalAyat']);
 
         return [
-            'rows'       => $result,
-            'dates'      => $dates,
-            'totalAyat'  => array_sum(array_column($result, 'totalAyat')),
-            'totalSetor' => array_sum(array_column($result, 'setoran')),
-            'totalSiswa' => count($result),
+            'rows'        => $result,
+            'dates'       => $dates,
+            'totalAyat'   => array_sum(array_column($result, 'totalAyat')),
+            'totalSetor'  => array_sum(array_column($result, 'setoran')),
+            'totalSiswa'  => count($result),
             'daysInMonth' => count($dates),
         ];
     }
 
-    // ── Shared private helpers ─────────────────────────────────────────
+    // ── Private helpers ───────────────────────────────────────────────
 
+    /**
+     * Ambil siswa berdasarkan kelas_pivot, bukan dari mutabaah_records.
+     * Ini yang memastikan semua siswa di kelas tampil, termasuk yang belum setoran.
+     */
     private function getSiswaList(): \Illuminate\Support\Collection
     {
-        return Siswa::whereHas(
-            'kelas',
-            fn($q) =>
+        return Siswa::whereHas('kelas', fn ($q) =>
             $q->where('kelas.id', $this->kelas_id)
-                ->where('kelas_pivot.is_aktif', true)
-                ->whereNull('kelas_pivot.deleted_at')
+              ->where('kelas_pivot.is_aktif', true)
+              ->whereNull('kelas_pivot.deleted_at')
         )->orderBy('nama_lengkap')->get();
     }
 
-    private function fetchRecords(string $from, string $to): \Illuminate\Support\Collection
+    /**
+     * Ambil records berdasarkan siswa_id (bukan kelas_id),
+     * karena kelas_id di records bisa berbeda dengan pivot saat data dummy.
+     */
+    private function fetchRecords(string $from, string $to, \Illuminate\Support\Collection $siswaList): \Illuminate\Support\Collection
     {
         return MutabaahRecord::with(['surah'])
-            ->where('kelas_id', $this->kelas_id)
+            ->whereIn('siswa_id', $siswaList->pluck('id'))
             ->whereBetween('tanggal', [$from, $to])
             ->get();
     }
@@ -218,7 +207,7 @@ class MutabaahLaporan extends Page
         $sTidak   = 0;
 
         foreach ($dates as $date) {
-            $rec = $siswaRecs->first(fn($r) => $r->tanggal->format('Y-m-d') === $date);
+            $rec = $siswaRecs->first(fn ($r) => $r->tanggal->format('Y-m-d') === $date);
             $dayData[$date] = $rec;
             if ($rec) {
                 $sAyat += $rec->jumlah_ayat;
@@ -233,17 +222,11 @@ class MutabaahLaporan extends Page
         return [$dayData, $sAyat, $sSetoran, $sTidak];
     }
 
-    /**
-     * Kelompokkan dayData per minggu-dalam-bulan untuk ringkasan WA bulanan.
-     * Mengembalikan array of ['label' => 'Minggu 1', 'ayat' => 30, 'setor' => 5]
-     */
     private function buildWeeklySummary(array $dayData, array $dates): array
     {
         $weeks = [];
         $wNum  = 1;
-        $chunk = array_chunk($dates, 7);
-
-        foreach ($chunk as $weekDates) {
+        foreach (array_chunk($dates, 7) as $weekDates) {
             $ayat  = 0;
             $setor = 0;
             foreach ($weekDates as $d) {
@@ -258,7 +241,6 @@ class MutabaahLaporan extends Page
             $weeks[] = ['label' => "Minggu {$wNum}", 'ayat' => $ayat, 'setor' => $setor];
             $wNum++;
         }
-
         return $weeks;
     }
 
@@ -279,22 +261,10 @@ class MutabaahLaporan extends Page
         unset($this->monthData);
     }
 
-    public function updatedKelasId(): void
-    {
-        unset($this->weekData, $this->monthData);
-    }
-    public function updatedMode(): void
-    {
-        unset($this->weekData, $this->monthData);
-    }
-    public function updatedBulan(): void
-    {
-        unset($this->monthData);
-    }
-    public function updatedTahun(): void
-    {
-        unset($this->monthData);
-    }
+    public function updatedKelasId(): void { unset($this->weekData, $this->monthData); }
+    public function updatedMode(): void    { unset($this->weekData, $this->monthData); }
+    public function updatedBulan(): void   { unset($this->monthData); }
+    public function updatedTahun(): void   { unset($this->monthData); }
 
     // ── Export CSV Pekanan ─────────────────────────────────────────────
 
@@ -304,11 +274,10 @@ class MutabaahLaporan extends Page
         $dates = $data['dates'] ?? $this->getWeekDates();
         $kelas = Kelas::find($this->kelas_id)?->nama_kelas ?? 'Kelas';
 
-        return response()->streamDownload(function () use ($data, $dates) {
+        return response()->streamDownload(function () use ($data, $dates, $kelas) {
             $out = fopen('php://output', 'w');
             fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
-            fputcsv($out, ['LAPORAN MUTABAAH TAHFIDZ - ' . (Kelas::find($this->kelas_id)?->nama_kelas ?? '')]);
+            fputcsv($out, ["LAPORAN MUTABAAH TAHFIDZ - {$kelas}"]);
             fputcsv($out, ['Periode: ' . $this->getWeekLabel()]);
             fputcsv($out, []);
 
@@ -346,20 +315,18 @@ class MutabaahLaporan extends Page
         $dates = $data['dates'] ?? $this->getMonthDates();
         $kelas = Kelas::find($this->kelas_id)?->nama_kelas ?? 'Kelas';
 
-        return response()->streamDownload(function () use ($data, $dates) {
-            $kelasNama = Kelas::find($this->kelas_id)?->nama_kelas ?? '';
-            $out       = fopen('php://output', 'w');
+        return response()->streamDownload(function () use ($data, $dates, $kelas) {
+            $out = fopen('php://output', 'w');
             fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
-            fputcsv($out, ["LAPORAN MUTABAAH TAHFIDZ BULANAN - {$kelasNama}"]);
+            fputcsv($out, ["LAPORAN MUTABAAH TAHFIDZ BULANAN - {$kelas}"]);
             fputcsv($out, ['Periode: ' . $this->getMonthLabel()]);
             fputcsv($out, []);
 
-            // Header: No | Nama | 1 | 2 | ... | 31 | Total Ayat | Hari Setor | Tidak Setor
             $header = ['No', 'Nama Siswa'];
             foreach ($dates as $date) {
-                $d      = Carbon::parse($date);
-                $header[] = $d->format('d') . ' ' . mb_substr(self::HARI_LABEL[$d->dayOfWeek === 0 ? 6 : $d->dayOfWeek - 1] ?? '', 0, 3);
+                $d        = Carbon::parse($date);
+                $hIdx     = $d->dayOfWeek === 0 ? 6 : $d->dayOfWeek - 1;
+                $header[] = $d->format('d') . ' ' . (self::HARI_LABEL[$hIdx] ?? '');
             }
             $header[] = 'Total Ayat';
             $header[] = 'Hari Setoran';
@@ -370,7 +337,9 @@ class MutabaahLaporan extends Page
                 $line = [$i + 1, $row['siswa']->nama_lengkap];
                 foreach ($dates as $date) {
                     $rec    = $row['dayData'][$date] ?? null;
-                    $line[] = $rec ? MutabaahRecord::statusEmoji($rec->status) . ' ' . ($rec->jumlah_ayat > 0 ? $rec->jumlah_ayat . 'A' : '') : '';
+                    $line[] = $rec
+                        ? MutabaahRecord::statusEmoji($rec->status) . ($rec->jumlah_ayat > 0 ? ' ' . $rec->jumlah_ayat . 'A' : '')
+                        : '';
                 }
                 $line[] = $row['totalAyat'];
                 $line[] = $row['setoran'];
@@ -381,14 +350,13 @@ class MutabaahLaporan extends Page
             // Total row
             $totals = ['', 'TOTAL'];
             foreach ($dates as $date) {
-                $dayTotal = collect($data['rows'] ?? [])->sum(fn($r) => $r['dayData'][$date]?->jumlah_ayat ?? 0);
+                $dayTotal = collect($data['rows'] ?? [])->sum(fn ($r) => $r['dayData'][$date]?->jumlah_ayat ?? 0);
                 $totals[] = $dayTotal > 0 ? $dayTotal : '';
             }
             $totals[] = $data['totalAyat'] ?? 0;
             $totals[] = $data['totalSetor'] ?? 0;
             $totals[] = '';
             fputcsv($out, $totals);
-
             fclose($out);
         }, "Laporan_Bulanan_{$kelas}_{$this->tahun}_{$this->bulan}.csv", [
             'Content-Type' => 'text/csv; charset=UTF-8',

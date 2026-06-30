@@ -1,0 +1,15 @@
+{
+    "name": "Midtrans",
+    "alias": "midtrans",
+    "description": "Midtrans Payment Gateway Integration Module",
+    "keywords": [
+        "payment",
+        "midtrans",
+        "gateway"
+    ],
+    "priority": 0,
+    "providers": [
+        "Modules\\Midtrans\\Providers\\MidtransServiceProvider"
+    ],
+    "files": []
+}

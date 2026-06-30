@@ -14,7 +14,7 @@ class JurnalGuruSeeder extends Seeder
 {
     public function run(): void
     {
-        JurnalGuru::truncate();
+        // JurnalGuru::truncate();
 
         $tahunAjaran = TahunAjaran::where('is_aktif', true)->first();
         $gurus       = Guru::all();

@@ -9,6 +9,7 @@ class MataPelajaranSeeder extends Seeder
 {
     public function run(): void
     {
+        // MataPelajaran::truncate();
         $data = [
             // Umum
             ['pelajaran' => 'Matematika',       'kategori' => 'Umum'],

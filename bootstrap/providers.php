@@ -16,8 +16,14 @@ return [
     Modules\Siswa\SiswaServiceProvider::class,
     Modules\TahunAjaran\TahunAjaranServiceProvider::class,
     Modules\MutabaahTahfidz\MutabaahTahfidzServiceProvider::class,
+    Modules\DashboardBuilder\DashboardBuilderServiceProvider::class,
+    Modules\Midtrans\MidtransServiceProvider::class,
+
+    //commented out because of error
+    
     Modules\JurnalGuru\JurnalGuruServiceProvider::class,
     Modules\JadwalPelajaran\JadwalPelajaranServiceProvider::class,
+    Modules\Penilaian\PenilaianServiceProvider::class,
     Modules\AbsensiStaf\AbsensiStafServiceProvider::class,
     Modules\KelasPivot\KelasPivotServiceProvider::class,
 ];

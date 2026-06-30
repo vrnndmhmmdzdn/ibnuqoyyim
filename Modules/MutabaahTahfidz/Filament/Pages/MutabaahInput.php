@@ -65,12 +65,10 @@ class MutabaahInput extends Page
     {
         if (!$this->kelas_id) return collect();
 
-        return Siswa::whereHas(
-            'kelas',
-            fn($q) =>
+        return Siswa::whereHas('kelas', fn ($q) =>
             $q->where('kelas.id', $this->kelas_id)
-                ->where('kelas_pivot.is_aktif', true)
-                ->whereNull('kelas_pivot.deleted_at')
+              ->where('kelas_pivot.is_aktif', true)
+              ->whereNull('kelas_pivot.deleted_at')
         )->orderBy('nama_lengkap')->get();
     }
 
@@ -80,7 +78,7 @@ class MutabaahInput extends Page
         if (!$this->kelas_id || !$this->tanggal) return collect();
 
         return MutabaahRecord::with(['surah'])
-            ->whereIn('siswa_id', $this->siswaList()->pluck('id'))
+            ->whereIn('siswa_id', $this->siswaList->pluck('id'))
             ->whereDate('tanggal', $this->tanggal)
             ->get()
             ->keyBy('siswa_id');
@@ -133,7 +131,6 @@ class MutabaahInput extends Page
         if (!$this->selected_siswa_id || !$this->kelas_id) return null;
 
         return MutabaahRecord::with('surah')
-            // ->where('kelas_id', $this->kelas_id)
             ->where('siswa_id', $this->selected_siswa_id)
             ->whereDate('tanggal', '!=', $this->tanggal)
             ->whereIn('status', MutabaahRecord::STATUS_NEEDS_SURAH)
@@ -189,8 +186,7 @@ class MutabaahInput extends Page
         $this->catatan = '';
 
         // Auto-fill from previous record
-        $lastRec = MutabaahRecord::where('kelas_id', $this->kelas_id)
-            ->where('siswa_id', $siswaId)
+        $lastRec = MutabaahRecord::where('siswa_id', $siswaId)
             ->whereIn('status', MutabaahRecord::STATUS_NEEDS_SURAH)
             ->latest('tanggal')
             ->first();
@@ -319,14 +315,8 @@ class MutabaahInput extends Page
         $this->selected_siswa_id = null;
         $this->edit_id           = null;
         $this->resetFormFields();
-        unset(
-            $this->selectedSiswa,
-            $this->lastRecord,
-            $this->selectedSurah,
-            $this->jumlahAyat,
-            $this->showSurahSection,
-            $this->showNilaiSection
-        );
+        unset($this->selectedSiswa, $this->lastRecord, $this->selectedSurah,
+              $this->jumlahAyat, $this->showSurahSection, $this->showNilaiSection);
     }
 
     private function resetFormFields(): void

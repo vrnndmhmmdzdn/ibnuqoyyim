@@ -78,13 +78,18 @@ class AbsensiDashboard extends Page
         return $gurus->map(function (Guru $guru) use ($absensi) {
             $abs = $absensi->get($guru->id);
             return (object) [
-                'guru'        => $guru,
-                'absensi'     => $abs,
-                'status'      => $abs?->status ?? 'belum',
-                'clock_in'    => $abs?->clock_in_at?->format('H:i') ?? '-',
-                'clock_out'   => $abs?->clock_out_at?->format('H:i') ?? '-',
-                'telat'       => $abs?->telat ?? 0,
-                'durasi'      => $abs?->durasi ?? '-',
+                'guru'          => $guru,
+                'absensi'       => $abs,
+                'status'        => $abs?->status ?? 'belum',
+                'clock_in'      => $abs?->clock_in_at?->format('H:i') ?? '-',
+                'clock_out'     => $abs?->clock_out_at?->format('H:i') ?? '-',
+                'telat'         => $abs?->telat ?? 0,
+                'durasi'        => $abs?->durasi ?? '-',
+                // Tambah ini
+                'clock_in_lat'  => $abs?->clock_in_lat,
+                'clock_in_lng'  => $abs?->clock_in_lng,
+                'clock_out_lat' => $abs?->clock_out_lat,
+                'clock_out_lng' => $abs?->clock_out_lng,
             ];
         });
     }
@@ -105,5 +110,24 @@ class AbsensiDashboard extends Page
             ];
         }
         return $data;
+    }
+
+    #[Computed]
+    public function koordinatStaf(): array
+    {
+        return $this->daftarStaf
+            ->filter(fn($item) => $item->clock_in_lat && $item->clock_in_lng)
+            ->map(fn($item) => [
+                'nama'          => $item->guru->name,
+                'status'        => $item->status,
+                'clock_in'      => $item->clock_in,
+                'clock_out'     => $item->clock_out,
+                'clock_in_lat'  => (float) $item->clock_in_lat,
+                'clock_in_lng'  => (float) $item->clock_in_lng,
+                'clock_out_lat' => $item->clock_out_lat ? (float) $item->clock_out_lat : null,
+                'clock_out_lng' => $item->clock_out_lng ? (float) $item->clock_out_lng : null,
+            ])
+            ->values()
+            ->toArray();
     }
 }

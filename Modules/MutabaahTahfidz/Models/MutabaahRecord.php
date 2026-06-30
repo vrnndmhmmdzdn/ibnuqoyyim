@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Guru\Models\Guru;
 use Modules\Kelas\Models\Kelas;
 use Modules\Siswa\Models\Siswa;
+use Modules\MutabaahTahfidz\Models\MutabaahSurah;
 
 class MutabaahRecord extends Model
 {
