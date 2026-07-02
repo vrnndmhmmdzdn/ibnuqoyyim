@@ -36,7 +36,7 @@
             "Modules\\MediaAsset\\": "Modules/MediaAsset/",
             "Modules\\KalenderDidik\\": "Modules/KalenderDidik/",
             "Modules\\DynamicForm\\": "Modules/DynamicForm/",
-           
+            "Modules\\Donation\\": "Modules/Donation/",
             "Modules\\Forum\\": "Modules/Forum/",
             "Modules\\Siswa\\": "Modules/Siswa/",
             "Modules\\JadwalPelajaran\\": "Modules/JadwalPelajaran/",
@@ -46,8 +46,8 @@
             "Modules\\Penilaian\\": "Modules/Penilaian/",
             "Modules\\KelasPivot\\": "Modules/KelasPivot/",
             "Modules\\AbsensiStaf\\": "Modules/AbsensiStaf/",
-            "Modules\\DashboardBuilder\\": "Modules/DashboardBuilder/",
-            "Modules\\Midtrans\\": "Modules/Midtrans/"
+            "Modules\\Midtrans\\": "Modules/Midtrans/",
+            "Modules\\DashboardBuilder\\": "Modules/DashboardBuilder/"
         }
     },
     "autoload-dev": {

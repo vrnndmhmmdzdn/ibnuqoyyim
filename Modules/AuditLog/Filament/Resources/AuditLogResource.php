@@ -62,4 +62,8 @@ class AuditLogResource extends Resource
     {
         return false;
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

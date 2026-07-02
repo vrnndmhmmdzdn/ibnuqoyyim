@@ -55,7 +55,7 @@ class JurnalLampiran extends Model
     // URL untuk akses file
     public function getUrlAttribute(): string
     {
-        return Storage::url($this->path);
+        return Storage::disk('public')->url($this->path);
     }
 
     // Ukuran file dalam format readable

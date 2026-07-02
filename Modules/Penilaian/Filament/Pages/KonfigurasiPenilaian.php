@@ -110,4 +110,8 @@ class KonfigurasiPenilaian extends Page
         $this->bobot_pas    = 30;
         unset($this->totalBobot, $this->bobotValid);
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

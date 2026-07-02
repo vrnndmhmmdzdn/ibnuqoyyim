@@ -23,4 +23,8 @@ class JurnalGuruManagement extends Page
     public function getTitle(): string { return 'Manajemen Jurnal Guru'; }
     public function getHeading(): string { return 'Manajemen Jurnal Guru'; }
     public function getSubheading(): ?string { return 'Pantau keaktifan guru dalam mengisi jurnal mengajar'; }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

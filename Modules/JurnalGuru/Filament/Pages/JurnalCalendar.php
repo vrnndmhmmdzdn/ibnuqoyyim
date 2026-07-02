@@ -46,20 +46,31 @@ class JurnalCalendar extends Page
     #[Computed]
     public function jurnals(): array
     {
-        $query = JurnalGuru::with(['guru', 'kelas', 'mataPelajaran'])
+        $user = auth()->user();
+
+        $query = JurnalGuru::with(['guru', 'kelas', 'mataPelajaran', 'lampirans'])
             ->orderBy('tanggal')
             ->orderBy('jam_mulai');
 
-        if ($this->guru_id) {
-            $query->where('guru_id', $this->guru_id);
+        $selectedGuruId = $this->guru_id ? (int) $this->guru_id : null;
+        $selectedKelasId = $this->kelas_id ? (int) $this->kelas_id : null;
+        $selectedCapaian = trim($this->capaian);
+
+        if($user && $user->role !== 'admin'){
+            $guru = Guru::where('user_id', $user->id)->first();
+            $query->where('guru_id', $guru?->id ?? 0);
+        }else{
+            if($selectedGuruId){
+                $query->where('guru_id', $selectedGuruId);
+            }
         }
 
-        if ($this->kelas_id) {
-            $query->where('kelas_id', $this->kelas_id);
+        if ($selectedKelasId){
+            $query->where('kelas_id', $selectedKelasId);
         }
 
-        if ($this->capaian) {
-            $query->where('capaian', $this->capaian);
+        if ($selectedCapaian !== '') {
+            $query->where('capaian', $selectedCapaian);
         }
 
         return $query->get()
@@ -84,11 +95,11 @@ class JurnalCalendar extends Page
                         'pertemuan_ke'      => $jurnal->pertemuan_ke ?? '-',
                         'materi'            => $jurnal->materi,
                         'kompetensi_dasar'  => $jurnal->kompetensi_dasar,
-                        'deskripsi_kegiatan'=> $jurnal->deskripsi_kegiatan,
+                        'deskripsi_kegiatan' => $jurnal->deskripsi_kegiatan,
                         'metode'            => JurnalGuru::METODE[$jurnal->metode_pembelajaran] ?? '-',
                         'media'             => $jurnal->media_pembelajaran ?? '-',
                         'jumlah_hadir'      => $jurnal->jumlah_hadir,
-                        'jumlah_tidak_hadir'=> $jurnal->jumlah_tidak_hadir,
+                        'jumlah_tidak_hadir' => $jurnal->jumlah_tidak_hadir,
                         'total_siswa'       => $jurnal->total_siswa,
                         'persentase_hadir'  => $jurnal->persentase_hadir,
                         'capaian'           => JurnalGuru::CAPAIAN[$jurnal->capaian] ?? '-',
@@ -96,6 +107,17 @@ class JurnalCalendar extends Page
                         'tindak_lanjut'     => $jurnal->tindak_lanjut ?? '-',
                         'catatan'           => $jurnal->catatan ?? '-',
                         'status'            => JurnalGuru::STATUS[$jurnal->status] ?? '-',
+                        'lampirans'         => $jurnal->lampirans->map(function ($lampiran) {
+                            $ekstensi = strtolower(pathinfo($lampiran->nama_file, PATHINFO_EXTENSION));
+                            return [
+                                'id'        => $lampiran->id,
+                                'nama_file' => $lampiran->nama_file,
+                                'tipe'      => \Modules\JurnalGuru\Models\JurnalLampiran::TIPE[$lampiran->tipe] ?? $lampiran->tipe,
+                                'url'       => \Illuminate\Support\Facades\Storage::url($lampiran->path), // Mengambil URL publik
+                                'is_image'  => in_array($ekstensi, ['jpg', 'jpeg', 'png', 'webp']),
+                                'is_pdf'    => $ekstensi === 'pdf',
+                            ];
+                        })->toArray(),
                     ],
                 ];
             })

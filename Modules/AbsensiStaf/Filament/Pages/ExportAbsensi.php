@@ -101,4 +101,8 @@ class ExportAbsensi extends Page
             $fileName
         );
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

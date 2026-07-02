@@ -26,4 +26,5 @@ return [
     Modules\Penilaian\PenilaianServiceProvider::class,
     Modules\AbsensiStaf\AbsensiStafServiceProvider::class,
     Modules\KelasPivot\KelasPivotServiceProvider::class,
+    // Modules\TelegramAssistant\TelegramAssistantServiceProvider::class,
 ];

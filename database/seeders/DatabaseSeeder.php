@@ -17,21 +17,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Azla',
-            'email' => 'azla@example.com',
-            'role' => 'admin',
-        ]);
-        User::factory()->create([
-            'name' => 'Guru',
-            'email' => 'guru@example.com',
-            'role' => 'guru',
-        ]);
-        User::factory()->create([
-            'name' => 'Ortu',
-            'email' => 'ortu@example.com',
-            'role' => 'ortu',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Azla',
+        //     'email' => 'azla@example.com',
+        //     'role' => 'admin',
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Guru',
+        //     'email' => 'guru@example.com',
+        //     'role' => 'guru',
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Ortu',
+        //     'email' => 'ortu@example.com',
+        //     'role' => 'ortu',
+        // ]);
 
         $this->call([
 
@@ -48,11 +48,16 @@ class DatabaseSeeder extends Seeder
             // \Modules\TahunAjaran\Database\Seeders\TahunAjaranSeeder::class,
             // \Modules\JadwalPelajaran\Database\Seeders\JadwalPelajaranSeeder::class,
             
-            // \Modules\KelasPivot\Database\Seeders\KelasPivotSeeder::class,
+            \Modules\KelasPivot\Database\Seeders\KelasPivotSeeder::class,
             // \Modules\AbsensiStaf\Database\Seeders\AbsensiStafSeeder::class,
 
             // \Modules\Penilaian\Database\Seeders\PenilaianSeeder::class,
             // \Modules\JurnalGuru\Database\Seeders\JurnalGuruSeeder::class,
+
+            // \Modules\JadwalPelajaran\Database\Seeders\JadwalPelajaranSeeder::class,
+            // \Modules\Midtrans\Database\Seeders\MidtransSeeder::class,
+
+
 
             // Tambahkan class seeder modul lainnya di bawah ini...
         ]);

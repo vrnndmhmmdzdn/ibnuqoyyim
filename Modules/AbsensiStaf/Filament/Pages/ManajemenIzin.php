@@ -169,4 +169,8 @@ class ManajemenIzin extends Page
             $tanggal->addDay();
         }
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

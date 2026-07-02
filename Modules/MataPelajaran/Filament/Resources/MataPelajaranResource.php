@@ -60,4 +60,8 @@ class MataPelajaranResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

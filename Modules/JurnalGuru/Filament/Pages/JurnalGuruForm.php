@@ -2,23 +2,28 @@
 
 namespace Modules\JurnalGuru\Filament\Pages;
 
-use Filament\Pages\Page;
+use BackedEnum;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Filament\Support\Icons\Heroicon;
 use Livewire\Attributes\Computed;
-use Modules\JurnalGuru\Models\JurnalGuru;
+use Livewire\WithFileUploads;
+use Modules\Guru\Models\Guru;
 use Modules\JadwalPelajaran\Models\JadwalPelajaran;
+use Modules\JurnalGuru\Models\JurnalGuru;
+use Modules\JurnalGuru\Models\JurnalLampiran;
 use Modules\Kelas\Models\Kelas;
 use Modules\MataPelajaran\Models\MataPelajaran;
 use Modules\TahunAjaran\Models\TahunAjaran;
-use Modules\Guru\Models\Guru;
-use Carbon\Carbon;
-use BackedEnum;
-use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Storage;
 use UnitEnum;
-use Livewire\WithFileUploads;
 
 class JurnalGuruForm extends Page
 {
+    // Mengaktifkan fitur upload file di Livewire
+    use WithFileUploads;
+
     protected string $view = 'jurnal-guru::filament.pages.jurnal-guru-form';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
@@ -38,9 +43,9 @@ class JurnalGuruForm extends Page
     public ?int    $kelas_id          = null;
     public ?int    $mata_pelajaran_id = null;
     public ?int    $tahun_ajaran_id   = null;
+    public ?int    $pertemuan_ke      = 1;
     public string  $jam_mulai         = '';
     public string  $jam_selesai       = '';
-    public ?int    $pertemuan_ke      = null;
     public string  $materi            = '';
     public string  $kompetensi_dasar  = '';
     public string  $deskripsi_kegiatan = '';
@@ -51,40 +56,54 @@ class JurnalGuruForm extends Page
     public string  $capaian           = 'tercapai';
     public string  $tindak_lanjut     = '';
     public string  $catatan           = '';
-    public string  $status            = 'draft';
+
+    // File Lampiran Tambahan Saat Input Form Utama
+    public $lampiran_file;
+
+    // Upload & Success State (untuk manajemen setelah jurnal tersimpan)
+    public ?int $jurnal_id_tersimpan = null;
 
     public function mount(): void
     {
-        $this->tanggal        = today()->format('Y-m-d');
-        $this->tahun_ajaran_id = TahunAjaran::where('is_aktif', true)->first()?->id;
-        $this->guru_id        = auth()->user()->guru?->id;
+        $this->tanggal = today()->format('Y-m-d');
+        
+        // Auto-assign tahun ajaran aktif jika ada
+        $aktif = TahunAjaran::where('is_aktif', true)->first();
+        if ($aktif) {
+            $this->tahun_ajaran_id = $aktif->id;
+        }
+
+        // Jika user yang login terikat dengan data Guru, kunci guru_id ke dirinya sendiri
+        $user = auth()->user();
+        if ($user) {
+            $guru = Guru::where('user_id', $user->id)->first();
+            if ($guru) {
+                $this->guru_id = $guru->id;
+            }
+        }
     }
 
     #[Computed]
-    public function jadwalHariIni(): \Illuminate\Support\Collection
+    public function jadwals()
     {
-        if (!$this->tanggal || !$this->guru_id) return collect();
+        if (!$this->tanggal) {
+            return collect();
+        }
 
-        $namaHari = Carbon::parse($this->tanggal)->locale('id')->translatedFormat('l');
+        $user = auth()->user();
+        $query = JadwalPelajaran::with(['kelas', 'mataPelajaran', 'guru'])
+            ->where('hari', $this->namaHariIndo);
 
-        // Map nama hari Indonesia ke enum
-        $hariMap = [
-            'Senin'  => 'Senin',
-            'Selasa' => 'Selasa',
-            'Rabu'   => 'Rabu',
-            'Kamis'  => 'Kamis',
-            'Jumat'  => 'Jumat',
-            'Sabtu'  => 'Sabtu',
-        ];
+        // PERBAIKAN FILTER: Jika user yang login terdaftar sebagai Guru, 
+        // MAKA WAJIB hanya menampilkan jadwal miliknya sendiri.
+        if ($user) {
+            $guru = Guru::where('user_id', $user->id)->first();
+            if ($guru) {
+                $query->where('guru_id', $guru->id);
+            }
+        }
 
-        $hari = $hariMap[$namaHari] ?? null;
-        if (!$hari) return collect();
-
-        return JadwalPelajaran::with(['kelas', 'mataPelajaran'])
-            ->where('guru_id', $this->guru_id)
-            ->where('hari', $hari)
-            ->orderBy('jam_mulai')
-            ->get();
+        return $query->orderBy('jam_mulai')->get();
     }
 
     #[Computed]
@@ -102,111 +121,116 @@ class JurnalGuruForm extends Page
     #[Computed]
     public function mapelList(): array
     {
-        return MataPelajaran::where('is_aktif', true)
-            ->orderBy('pelajaran')
-            ->pluck('pelajaran', 'id')
-            ->toArray();
+        return MataPelajaran::orderBy('pelajaran')->pluck('pelajaran', 'id')->toArray();
+    }
+
+    #[Computed]
+    public function lampirans()
+    {
+        if (!$this->jurnal_id_tersimpan) {
+            return collect();
+        }
+        return JurnalLampiran::where('jurnal_guru_id', $this->jurnal_id_tersimpan)
+            ->orderBy('id', 'desc')
+            ->get();
+    }
+
+    public function getNamaHariIndoProperty(): string
+    {
+        return Carbon::parse($this->tanggal)->locale('id')->translatedFormat('l'); // 'Senin', 'Selasa', dll
     }
 
     public function updatedTanggal(): void
     {
-        // Reset pilihan jadwal ketika tanggal berubah
-        $this->reset([
-            'selected_jadwal_id', 'mode_manual',
-            'kelas_id', 'mata_pelajaran_id',
-            'jam_mulai', 'jam_selesai', 'pertemuan_ke',
-        ]);
-    }
-
-    public function pilihJadwal(int $jadwalId): void
-    {
-        $jadwal = JadwalPelajaran::with(['kelas', 'mataPelajaran'])->find($jadwalId);
-        if (!$jadwal) return;
-
-        $this->selected_jadwal_id = $jadwalId;
-        $this->mode_manual        = false;
-
-        // Auto-fill dari jadwal
-        $this->kelas_id          = $jadwal->kelas_id;
-        $this->mata_pelajaran_id = $jadwal->mata_pelajaran_id;
-        $this->jam_mulai         = substr($jadwal->jam_mulai, 0, 5);
-        $this->jam_selesai       = substr($jadwal->jam_selesai, 0, 5);
-
-        // Hitung pertemuan_ke otomatis
-        $this->pertemuan_ke = JurnalGuru::where('guru_id', $this->guru_id)
-            ->where('kelas_id', $jadwal->kelas_id)
-            ->where('mata_pelajaran_id', $jadwal->mata_pelajaran_id)
-            ->count() + 1;
+        $this->resetFormLaporan();
+        $this->selected_jadwal_id = null;
+        $this->mode_manual = false;
     }
 
     public function inputManual(): void
     {
-        $this->mode_manual        = true;
+        $this->mode_manual = !$this->mode_manual;
         $this->selected_jadwal_id = null;
-        $this->reset([
-            'kelas_id', 'mata_pelajaran_id',
-            'jam_mulai', 'jam_selesai', 'pertemuan_ke',
-        ]);
+        $this->resetFormLaporan();
     }
 
-    public function updatedKelasId(): void
+    public function pilihJadwal(int $jadwalId): void
     {
-        $this->hitungPertemuan();
+        $this->selected_jadwal_id = $jadwalId;
+        $this->mode_manual = false;
+
+        $jadwal = JadwalPelajaran::find($jadwalId);
+        if ($jadwal) {
+            $this->guru_id           = $jadwal->guru_id;
+            $this->kelas_id          = $jadwal->kelas_id;
+            $this->mata_pelajaran_id = $jadwal->mata_pelajaran_id;
+            $this->jam_mulai         = substr($jadwal->jam_mulai, 0, 5);
+            $this->jam_selesai       = substr($jadwal->jam_selesai, 0, 5);
+            
+            // Prediksi pertemuan ke- berikutnya secara otomatis
+            $lastJurnal = JurnalGuru::where('kelas_id', $this->kelas_id)
+                ->where('mata_pelajaran_id', $this->mata_pelajaran_id)
+                ->orderBy('pertemuan_ke', 'desc')
+                ->first();
+
+            $this->pertemuan_ke = $lastJurnal ? ($lastJurnal->pertemuan_ke + 1) : 1;
+        }
     }
 
-    public function updatedMataPelajaranId(): void
+    private function resetFormLaporan(): void
     {
-        $this->hitungPertemuan();
+        $user = auth()->user();
+        $guru = $user ? Guru::where('user_id', $user->id)->first() : null;
+
+        // Jika dia bukan guru, kosongkan field guru_id agar bisa pilih manual
+        if (!$guru) {
+            $this->guru_id = null;
+        } else {
+            $this->guru_id = $guru->id;
+        }
+        
+        $this->kelas_id          = null;
+        $this->mata_pelajaran_id = null;
+        $this->pertemuan_ke      = 1;
+        $this->jam_mulai         = '';
+        $this->jam_selesai       = '';
+        $this->materi            = '';
+        $this->kompetensi_dasar  = '';
+        $this->deskripsi_kegiatan = '';
+        $this->metode_pembelajaran = '';
+        $this->media_pembelajaran = '';
+        $this->jumlah_hadir      = 0;
+        $this->jumlah_tidak_hadir = 0;
+        $this->capaian           = 'tercapai';
+        $this->tindak_lanjut     = '';
+        $this->catatan           = '';
+        $this->jurnal_id_tersimpan = null;
+        $this->reset('lampiran_file');
     }
 
-    private function hitungPertemuan(): void
-    {
-        if (!$this->guru_id || !$this->kelas_id || !$this->mata_pelajaran_id) return;
-
-        $this->pertemuan_ke = JurnalGuru::where('guru_id', $this->guru_id)
-            ->where('kelas_id', $this->kelas_id)
-            ->where('mata_pelajaran_id', $this->mata_pelajaran_id)
-            ->count() + 1;
-    }
-    use WithFileUploads;
-
-    // Tambah property
-    public $lampiran_file = null;
-    public ?int $jurnal_id_tersimpan = null;
-
-// Tambah setelah method simpan() — update return
-    public function simpan(string $statusInput): void
+    public function simpanJurnal(): void
     {
         $this->validate([
             'tanggal'             => 'required|date',
-            'guru_id'             => 'required|exists:gurus,id',
-            'kelas_id'            => 'required|exists:kelas,id',
-            'mata_pelajaran_id'   => 'required|exists:mata_pelajarans,id',
+            'guru_id'             => 'required|integer',
+            'kelas_id'            => 'required|integer',
+            'mata_pelajaran_id'   => 'required|integer',
+            'tahun_ajaran_id'     => 'required|integer',
             'jam_mulai'           => 'required',
             'jam_selesai'         => 'required',
+            'pertemuan_ke'        => 'required|integer|min:1',
             'materi'              => 'required|string|max:255',
             'kompetensi_dasar'    => 'required|string',
             'deskripsi_kegiatan'  => 'required|string',
             'metode_pembelajaran' => 'required|string',
+            'media_pembelajaran'  => 'nullable|string|max:255',
             'jumlah_hadir'        => 'required|integer|min:0',
             'jumlah_tidak_hadir'  => 'required|integer|min:0',
-            'capaian'             => 'required|in:tercapai,sebagian,belum',
+            'capaian'             => 'required|string',
+            'tindak_lanjut'       => 'nullable|string',
+            'catatan'             => 'nullable|string',
+            'lampiran_file'       => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx,xlsm,ppt,pptx|max:10240',
         ]);
-
-        $sudahAda = JurnalGuru::where('guru_id', $this->guru_id)
-            ->where('kelas_id', $this->kelas_id)
-            ->where('mata_pelajaran_id', $this->mata_pelajaran_id)
-            ->whereDate('tanggal', $this->tanggal)
-            ->exists();
-
-        if ($sudahAda) {
-            Notification::make()
-                ->title('Jurnal sudah ada!')
-                ->body('Jurnal untuk kombinasi ini sudah pernah diisi pada tanggal tersebut.')
-                ->warning()
-                ->send();
-            return;
-        }
 
         $jurnal = JurnalGuru::create([
             'guru_id'             => $this->guru_id,
@@ -221,59 +245,102 @@ class JurnalGuruForm extends Page
             'kompetensi_dasar'    => $this->kompetensi_dasar,
             'deskripsi_kegiatan'  => $this->deskripsi_kegiatan,
             'metode_pembelajaran' => $this->metode_pembelajaran,
-            'media_pembelajaran'  => $this->media_pembelajaran ?: null,
+            'media_pembelajaran'  => $this->media_pembelajaran,
             'jumlah_hadir'        => $this->jumlah_hadir,
             'jumlah_tidak_hadir'  => $this->jumlah_tidak_hadir,
             'capaian'             => $this->capaian,
-            'tindak_lanjut'       => $this->tindak_lanjut ?: null,
-            'catatan'             => $this->catatan ?: null,
-            'status'              => $statusInput,
-            'submitted_at'        => $statusInput === 'submitted' ? now() : null,
+            'tindak_lanjut'       => $this->tindak_lanjut,
+            'catatan'             => $this->catatan,
+            'status'              => 'submitted',
+            'submitted_at'        => now(),
         ]);
 
-        // Simpan id jurnal untuk section lampiran
         $this->jurnal_id_tersimpan = $jurnal->id;
 
+        // PROSES UPLOAD DOKUMEN/LAMPIRAN JIKA ADA FILE YANG DIPIILIH
+        if ($this->lampiran_file) {
+            $file      = $this->lampiran_file;
+            $ekstensi  = $file->getClientOriginalExtension();
+            $namaFile  = $file->getClientOriginalName();
+            $path      = $file->store('jurnal-lampirans/' . $jurnal->id, 'public');
+
+            JurnalLampiran::create([
+                'jurnal_guru_id' => $jurnal->id,
+                'nama_file'      => $namaFile,
+                'path'           => $path,
+                'tipe'           => JurnalLampiran::deteksiTipe($ekstensi),
+                'ukuran'         => $file->getSize(),
+            ]);
+
+            $this->reset('lampiran_file');
+        }
+
         Notification::make()
-            ->title($statusInput === 'submitted' ? 'Jurnal berhasil disubmit!' : 'Draft jurnal tersimpan!')
-            ->body('Silakan lampirkan file pendukung di bawah ini.')
+            ->title('Jurnal Pembelajaran berhasil disimpan!')
             ->success()
             ->send();
-
-        $this->reset([
-            'selected_jadwal_id', 'mode_manual',
-            'kelas_id', 'mata_pelajaran_id',
-            'jam_mulai', 'jam_selesai', 'pertemuan_ke',
-            'materi', 'kompetensi_dasar', 'deskripsi_kegiatan',
-            'metode_pembelajaran', 'media_pembelajaran',
-            'jumlah_hadir', 'jumlah_tidak_hadir',
-            'capaian', 'tindak_lanjut', 'catatan',
-        ]);
-
-        $this->capaian = 'tercapai';
-        $this->status  = 'draft';
     }
 
-    public function uploadLampiran(): void
+    // Fungsi pembantu jika user ingin menambah lampiran lagi setelah form utama disubmit
+    public function simpanLampiran(): void
     {
-        $this->validate([
-            'lampiran_file' => 'required|file|mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx,xlsm,ppt,pptx|max:10240',
-        ]);
-
+        if (!$this->jurnal_id_tersimpan){
+            Notification::make()
+            ->title('Sesi tidak valid')
+            ->body('Simpan jurnal anda terlebi dahulu sebelum menambahkan lampiran.')
+            ->warning()
+            ->send();
+            return;
+        }
+        if (!$this->lampiran_file){
+            Notification::make()
+            ->title('Pilih file terlebih dahulu')
+            ->warning()
+            ->send();
+            return;
+        }
         $jurnal = JurnalGuru::find($this->jurnal_id_tersimpan);
-        if (!$jurnal) return;
+        if (!$jurnal){
+            Notification::make()
+            ->title('Jurnal tidak ditemukan')
+            ->danger()
+            ->send();
+            return;
+        }
+        try{
+            $this->validate([
+                'lampiran_file' => 'required|file|mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx,xlsm,ppt,pptx|max:10240',
+            ]);
+        }catch(\Illuminate\Validation\ValidationException $e){
+            $pesanError = collect($e->errors())->flatten()->first();
+            Notification::make()
+            ->title('File tidak valid')
+            ->body($pesanError)
+            ->warning()
+            ->send();
+            return;
+        }
+        $file = $this->lampiran_file;
+        $ekkstensi = $file->getClientOriginalExtension();
+        $namaFile = $file->getClientOriginalName();
+        $ukuran = $file->getSize();
+        $path = $file->store('jurnal-lampirans/' . $jurnal->id, 'public');
 
-        $file      = $this->lampiran_file;
-        $ekstensi  = $file->getClientOriginalExtension();
-        $namaFile  = $file->getClientOriginalName();
-        $path      = $file->store('jurnal-lampirans/' . $jurnal->id, 'local');
+        if(!$path){
+            Notification::make()
+            ->title('Gagal mengunggah lampiran')
+            ->body('Periksan permission folder storage/app/public')
+            ->danger()
+            ->send();
+            return;
+        }
 
         JurnalLampiran::create([
             'jurnal_guru_id' => $jurnal->id,
             'nama_file'      => $namaFile,
             'path'           => $path,
-            'tipe'           => JurnalLampiran::deteksiTipe($ekstensi),
-            'ukuran'         => $file->getSize(),
+            'tipe'           => JurnalLampiran::deteksiTipe($ekkstensi),
+            'ukuran'         => $ukuran,
         ]);
 
         $this->reset('lampiran_file');
@@ -289,7 +356,7 @@ class JurnalGuruForm extends Page
         $lampiran = JurnalLampiran::find($lampiranId);
         if (!$lampiran) return;
 
-        Storage::disk('local')->delete($lampiran->path);
+        Storage::disk('public')->delete($lampiran->path);
         $lampiran->delete();
 
         Notification::make()
@@ -298,10 +365,13 @@ class JurnalGuruForm extends Page
             ->send();
     }
 
-    #[Computed]
-    public function lampiranJurnal(): \Illuminate\Support\Collection
-    {
-        if (!$this->jurnal_id_tersimpan) return collect();
-        return JurnalLampiran::where('jurnal_guru_id', $this->jurnal_id_tersimpan)->get();
+    public function selesaiInputJurnal(): void
+    {   
+        if ($this->lampiran_file){
+            $this->simpanLampiran();
+        }
+        $this->resetFormLaporan();
+        $this->selected_jadwal_id = null;
+        $this->mode_manual = false;
     }
 }

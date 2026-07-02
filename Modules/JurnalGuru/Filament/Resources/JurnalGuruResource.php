@@ -53,4 +53,8 @@ class JurnalGuruResource extends Resource
             \Modules\JurnalGuru\Filament\Resources\JurnalGuruResource\RelationManagers\LampiranRelationManager::class,
         ];
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }

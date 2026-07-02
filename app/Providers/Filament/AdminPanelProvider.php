@@ -95,6 +95,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: base_path('modules/DashboardBuilder/Filament/Pages'), for: 'Modules\DashboardBuilder\Filament\Pages')
             ->discoverResources(in: base_path('modules/Midtrans/Filament/Resources'), for: 'Modules\Midtrans\Filament\Resources')
             ->discoverPages(in: base_path('modules/Midtrans/Filament/Pages'), for: 'Modules\Midtrans\Filament\Pages');
-
+            // ->discoverResources(in: base_path('Modules/TelegramAssistant/Filament/Resources'), for: 'Modules\TelegramAssistant\Filament\Resources');
         }
 }

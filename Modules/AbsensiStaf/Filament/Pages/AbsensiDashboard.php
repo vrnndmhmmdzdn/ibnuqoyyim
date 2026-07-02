@@ -130,4 +130,8 @@ class AbsensiDashboard extends Page
             ->values()
             ->toArray();
     }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
 }
