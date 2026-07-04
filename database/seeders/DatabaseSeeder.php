@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,6 +24,14 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'azla@example.com',
         //     'role' => 'admin',
         // ]);
+        User::factory()->create([
+            'name' => 'Zaidan',
+            'email' => 'zaidan@example.com',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            ]);
         // User::factory()->create([
         //     'name' => 'Guru',
         //     'email' => 'guru@example.com',
@@ -48,7 +58,7 @@ class DatabaseSeeder extends Seeder
             // \Modules\TahunAjaran\Database\Seeders\TahunAjaranSeeder::class,
             // \Modules\JadwalPelajaran\Database\Seeders\JadwalPelajaranSeeder::class,
             
-            \Modules\KelasPivot\Database\Seeders\KelasPivotSeeder::class,
+            // \Modules\KelasPivot\Database\Seeders\KelasPivotSeeder::class,
             // \Modules\AbsensiStaf\Database\Seeders\AbsensiStafSeeder::class,
 
             // \Modules\Penilaian\Database\Seeders\PenilaianSeeder::class,
