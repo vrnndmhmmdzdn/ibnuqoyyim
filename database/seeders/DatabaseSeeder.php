@@ -17,31 +17,40 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Azla',
-        //     'email' => 'azla@example.com',
-        //     'role' => 'admin',
-        // ]);
+        
         User::factory()->create([
-            'name' => 'Zaidan',
-            'email' => 'zaidan@example.com',
+            'name' => 'Yunus Wirawan',
+            'email' => 'yunuswirawan@ibnuqoyyim.sch.id',
             'role' => 'admin',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             ]);
-        // User::factory()->create([
-        //     'name' => 'Guru',
-        //     'email' => 'guru@example.com',
-        //     'role' => 'guru',
-        // ]);
-        // User::factory()->create([
-        //     'name' => 'Ortu',
-        //     'email' => 'ortu@example.com',
-        //     'role' => 'ortu',
-        // ]);
+        User::factory()->create([
+            'name' => 'Ismail',
+            'email' => 'ismail@ibnuqoyyim.sch.id',
+            'role' => 'guru',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            ]);
+        User::factory()->create([
+            'name' => 'Khansa Tasfhia',
+            'email' => 'khansa@ibnuqoyyim.sch.id',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            ]);
+        User::factory()->create([
+            'name' => 'Pamedar',
+            'email' => 'pamedar@ibnuqoyyim.sch.id',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            ]);
+    
 
         $this->call([
 
