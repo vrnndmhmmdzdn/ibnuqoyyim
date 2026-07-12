@@ -25,6 +25,6 @@ class JurnalGuruManagement extends Page
     public function getSubheading(): ?string { return 'Pantau keaktifan guru dalam mengisi jurnal mengajar'; }
     public static function canAccess(): bool
     {
-        return auth()->user()->role === 'admin';
+        return auth()->user()->role == 'admin';
     }
 }

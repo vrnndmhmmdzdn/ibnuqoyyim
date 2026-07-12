@@ -62,6 +62,6 @@ class SiswaResource extends Resource
     }
     public static function canAccess(): bool
     {
-        return auth()->user()->role === 'admin';
+        return auth()->user()->role == 'admin';
     }
 }

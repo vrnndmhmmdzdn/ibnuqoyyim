@@ -18,7 +18,7 @@ class SiswaServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
         
         // Load views
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'siswa');
+        //$this->loadViewsFrom(__DIR__.'/resources/views', 'siswa');
         
         // Register Filament Resources
         if (class_exists(Filament::class)) {
