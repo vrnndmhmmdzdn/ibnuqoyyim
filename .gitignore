@@ -30,3 +30,6 @@ Thumbs.db
 /storage/app/public
 /storage/logs
 /bootstrap/cache
+.env
+.env.*
+.env production
