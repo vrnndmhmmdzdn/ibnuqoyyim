@@ -56,47 +56,62 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->discoverResources(in: base_path('Modules/Guru/Filament/Resources'), for: 'Modules\Guru\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Guru/Filament/Pages'), for: 'Modules\Guru\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/TahunAjaran/Filament/Resources'), for: 'Modules\TahunAjaran\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/TahunAjaran/Filament/Pages'), for: 'Modules\TahunAjaran\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/MataPelajaran/Filament/Resources'), for: 'Modules\MataPelajaran\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/MataPelajaran/Filament/Pages'), for: 'Modules\MataPelajaran\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Angkatan/Filament/Resources'), for: 'Modules\Angkatan\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Angkatan/Filament/Pages'), for: 'Modules\Angkatan\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Kelas/Filament/Resources'), for: 'Modules\Kelas\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Kelas/Filament/Pages'), for: 'Modules\Kelas\Filament\Pages')
+            ->discoverResources(in: base_path('modules/AbsensiStaf/Filament/Resources'), for: 'Modules\AbsensiStaf\Filament\Resources')
+            ->discoverPages(in: base_path('modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Angkatan/Filament/Resources'), for: 'Modules\Angkatan\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Angkatan/Filament/Pages'), for: 'Modules\Angkatan\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/AuditLog/Filament/Resources'), for: 'Modules\AuditLog\Filament\Resources')
+
+            ->discoverResources(in: base_path('Modules/DashboardBuilder/Filament/Resources'), for: 'Modules\DashboardBuilder\Filament\Resources')
+            ->discoverPages(in: base_path('Modules/DashboardBuilder/Filament/Pages'), for: 'Modules\DashboardBuilder\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Donation/Filament/Resources'), for: 'Modules\Donation\Filament\Resources')
+
+            ->discoverResources(in: base_path('Modules/DynamicForm/Filament/Resources'), for: 'Modules\DynamicForm\Filament\Resources')
+            ->discoverPages(in: base_path('Modules/DynamicForm/Filament/Pages'), for: 'Modules\DynamicForm\Filament\Pages')
+
+            ->discoverResources(in: base_path('Modules/Forum/Filament/Resources'), for: 'Modules\Forum\Filament\Resources')
+            ->discoverPages(in: base_path('Modules/Forum/Filament/Pages'), for: 'Modules\Forum\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Guru/Filament/Resources'), for: 'Modules\Guru\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Guru/Filament/Pages'), for: 'Modules\Guru\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/JadwalPelajaran/Filament/Resources'), for: 'Modules\JadwalPelajaran\Filament\Resources')
+            ->discoverPages(in: base_path('modules/JadwalPelajaran/Filament/Pages'), for: 'Modules\JadwalPelajaran\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/JurnalGuru/Filament/Resources'), for: 'Modules\JurnalGuru\Filament\Resources')
+            ->discoverPages(in: base_path('modules/JurnalGuru/Filament/Pages'), for: 'Modules\JurnalGuru\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/KalenderDidik/Filament/Resources'), for: 'Modules\KalenderDidik\Filament\Resources')
+            ->discoverPages(in: base_path('modules/KalenderDidik/Filament/Pages'), for: 'Modules\KalenderDidik\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Kelas/Filament/Resources'), for: 'Modules\Kelas\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Kelas/Filament/Pages'), for: 'Modules\Kelas\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/KelasPivot/Filament/Resources'), for: 'Modules\KelasPivot\Filament\Resources')
+            ->discoverPages(in: base_path('modules/KelasPivot/Filament/Pages'), for: 'Modules\KelasPivot\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/MataPelajaran/Filament/Resources'), for: 'Modules\MataPelajaran\Filament\Resources')
+            ->discoverPages(in: base_path('modules/MataPelajaran/Filament/Pages'), for: 'Modules\MataPelajaran\Filament\Pages')
 
             ->discoverResources(in: base_path('Modules/MediaAsset/Filament/Resources'), for: 'Modules\MediaAsset\Filament\Resources')
             ->discoverPages(in: base_path('Modules/MediaAsset/Filament/Pages'), for: 'Modules\MediaAsset\Filament\Pages')
 
-            ->discoverResources(in: base_path('Modules/KalenderDidik/Filament/Resources'), for: 'Modules\KalenderDidik\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/KalenderDidik/Filament/Pages'), for: 'Modules\KalenderDidik\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/DynamicForm/Filament/Resources'), for: 'Modules\DynamicForm\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/DynamicForm/Filament/Pages'), for: 'Modules\DynamicForm\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Donation/Filament/Resources'), for: 'Modules\Donation\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Donation/Filament/Pages'), for: 'Modules\Donation\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Forum/Filament/Resources'), for: 'Modules\Forum\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Forum/Filament/Pages'), for: 'Modules\Forum\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Siswa/Filament/Resources'), for: 'Modules\Siswa\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Siswa/Filament/Pages'), for: 'Modules\Siswa\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/AuditLog/Filament/Resources'), for: 'Modules\AuditLog\Filament\Resources')
-            ->discoverResources(in: base_path('Modules/JadwalPelajaran/Filament/Resources'), for: 'Modules\JadwalPelajaran\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/JadwalPelajaran/Filament/Pages'), for: 'Modules\JadwalPelajaran\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/JurnalGuru/Filament/Resources'), for: 'Modules\JurnalGuru\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/JurnalGuru/Filament/Pages'), for: 'Modules\JurnalGuru\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/Penilaian/Filament/Resources'), for: 'Modules\Penilaian\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Penilaian/Filament/Pages'), for: 'Modules\Penilaian\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/AbsensiStaf/Filament/Resources'), for: 'Modules\AbsensiStaf\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/AbsensiStaf/Filament/Pages'), for: 'Modules\AbsensiStaf\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/MutabaahTahfidz/Filament/Resources'), for: 'Modules\MutabaahTahfidz\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/MutabaahTahfidz/Filament/Pages'), for: 'Modules\MutabaahTahfidz\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/KelasPivot/Filament/Resources'), for: 'Modules\KelasPivot\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/KelasPivot/Filament/Pages'), for: 'Modules\KelasPivot\Filament\Pages')
-            ->discoverResources(in: base_path('Modules/DashboardBuilder/Filament/Resources'), for: 'Modules\DashboardBuilder\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/DashboardBuilder/Filament/Pages'), for: 'Modules\DashboardBuilder\Filament\Pages')
             ->discoverResources(in: base_path('Modules/Midtrans/Filament/Resources'), for: 'Modules\Midtrans\Filament\Resources')
-            ->discoverPages(in: base_path('Modules/Midtrans/Filament/Pages'), for: 'Modules\Midtrans\Filament\Pages');
-            // ->discoverResources(in: base_path('Modules/TelegramAssistant/Filament/Resources'), for: 'Modules\TelegramAssistant\Filament\Resources');
+            ->discoverPages(in: base_path('Modules/Midtrans/Filament/Pages'), for: 'Modules\Midtrans\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/MutabaahTahfidz/Filament/Resources'), for: 'Modules\MutabaahTahfidz\Filament\Resources')
+            ->discoverPages(in: base_path('modules/MutabaahTahfidz/Filament/Pages'), for: 'Modules\MutabaahTahfidz\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Penilaian/Filament/Resources'), for: 'Modules\Penilaian\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Penilaian/Filament/Pages'), for: 'Modules\Penilaian\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/Siswa/Filament/Resources'), for: 'Modules\Siswa\Filament\Resources')
+            ->discoverPages(in: base_path('modules/Siswa/Filament/Pages'), for: 'Modules\Siswa\Filament\Pages')
+
+            ->discoverResources(in: base_path('modules/TahunAjaran/Filament/Resources'), for: 'Modules\TahunAjaran\Filament\Resources')
+            ->discoverPages(in: base_path('modules/TahunAjaran/Filament/Pages'), for: 'Modules\TahunAjaran\Filament\Pages');
         }
-}
+    }

@@ -171,6 +171,6 @@ class ManajemenIzin extends Page
     }
     public static function canAccess(): bool
     {
-        return auth()->user()->role == 'admin';
+        return auth()->user()->role === 'admin';
     }
 }
